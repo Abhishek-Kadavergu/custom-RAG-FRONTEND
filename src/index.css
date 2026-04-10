@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-[#030014] text-white antialiased overflow-x-hidden;
+  }
+}
+
+/* Custom hide scrollbar but keep functionality */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Typestping cursor effect */
+.typing-cursor {
+    display: inline-block;
+    width: 3px;
+    height: 1em;
+    background-color: white;
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+    margin-left: 4px;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Glassmorphism utility */
+.glass {
+    @apply bg-white/5 backdrop-blur-lg border border-white/10 shadow-xl;
+}
