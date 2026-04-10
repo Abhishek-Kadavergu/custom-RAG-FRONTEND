@@ -6,7 +6,7 @@
 
 @layer base {
   body {
-    @apply bg-[#030014] text-white antialiased overflow-x-hidden;
+    @apply bg-[#FAFAFB] text-gray-800 antialiased overflow-x-hidden;
   }
 }
 
@@ -24,7 +24,7 @@
     display: inline-block;
     width: 3px;
     height: 1em;
-    background-color: white;
+    background-color: #6D5DFC;
     animation: blink 1s step-end infinite;
     vertical-align: text-bottom;
     margin-left: 4px;
@@ -37,5 +37,5 @@
 
 /* Glassmorphism utility */
 .glass {
-    @apply bg-white/5 backdrop-blur-lg border border-white/10 shadow-xl;
+    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)];
 }

@@ -1,27 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { SendHorizonal, Loader2 } from 'lucide-react';
-import clsx from 'clsx';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowUp } from 'lucide-react';
 
 const ChatInput = ({ onSend, isLoading }) => {
-  const [input, setInput] = useState('');
+  const [text, setText] = useState('');
   const textareaRef = useRef(null);
 
   // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+      textareaRef.current.style.height = '56px';
+      const scrollHeight = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height = Math.min(scrollHeight, 200) + 'px';
     }
-  }, [input]);
+  }, [text]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (input.trim() && !isLoading) {
-      onSend(input.trim());
-      setInput('');
+  const handleSend = () => {
+    if (text.trim() && !isLoading) {
+      onSend(text.trim());
+      setText('');
       if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = '56px';
       }
     }
   };
@@ -29,49 +28,51 @@ const ChatInput = ({ onSend, isLoading }) => {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e);
+      handleSend();
     }
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 relative">
-      {/* Gradient Glow Effect for the background */}
-      <div className="absolute inset-x-4 inset-y-4 bg-gradient-to-r from-purple-500/30 via-blue-500/30 to-pink-500/30 blur-xl opacity-50 rounded-3xl pointer-events-none" />
-      
-      <form 
-        onSubmit={handleSubmit}
-        className="relative flex items-end p-2 bg-[#101018] border border-white/10 rounded-2xl shadow-2xl focus-within:border-purple-500/50 focus-within:ring-1 focus-within:ring-purple-500/50 transition-all duration-300"
-      >
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6">
+      <div className="relative flex items-end w-full bg-white rounded-[32px] border border-gray-200 shadow-[0_2px_15px_rgba(0,0,0,0.04)] focus-within:border-[#6D5DFC]/40 focus-within:ring-4 focus-within:ring-[#6D5DFC]/10 focus-within:shadow-[0_4px_25px_rgba(109,93,252,0.1)] transition-all duration-300">
         <textarea
           ref={textareaRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isLoading}
-          placeholder="Ask anything..."
-          className="flex-1 max-h-[120px] bg-transparent text-gray-100 placeholder-gray-500 border-none outline-none resize-none p-3 scrollbar-hide text-base sm:text-lg overflow-y-auto leading-relaxed"
+          placeholder="Ask Abhi anything..."
+          className="w-full max-h-[200px] min-h-[56px] py-4 pl-6 pr-14 bg-transparent text-gray-800 placeholder-gray-400 focus:outline-none resize-none overflow-y-auto disabled:opacity-50 text-[16px] leading-[24px] rounded-[32px] scrollbar-hide"
           rows={1}
         />
-        
-        <motion.button
-          type="submit"
-          disabled={!input.trim() || isLoading}
-          whileHover={{ scale: input.trim() && !isLoading ? 1.05 : 1 }}
-          whileTap={{ scale: input.trim() && !isLoading ? 0.95 : 1 }}
-          className={clsx(
-            "p-3 rounded-xl ml-2 flex-shrink-0 transition-all duration-200",
-            input.trim() && !isLoading 
-              ? "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)] hover:bg-purple-500" 
-              : "bg-white/5 text-gray-500 cursor-not-allowed"
+
+        <AnimatePresence>
+          {(text.trim() || isLoading) && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.2 }}
+              className="absolute right-2 bottom-2"
+            >
+              <button
+                onClick={handleSend}
+                disabled={isLoading || !text.trim()}
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-[#6D5DFC] text-white shadow-md hover:bg-[#5C4EEB] hover:shadow-[0_0_15px_rgba(109,93,252,0.4)] hover:-translate-y-0.5 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+              >
+                {isLoading ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <ArrowUp className="w-5 h-5" strokeWidth={2.5} />
+                )}
+              </button>
+            </motion.div>
           )}
-        >
-          {isLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <SendHorizonal className="w-5 h-5" />
-          )}
-        </motion.button>
-      </form>
+        </AnimatePresence>
+      </div>
+      {/* <div className="text-center mt-3 text-xs text-gray-400 pb-2">
+        Abhi AI can make mistakes. Consider verifying important information.
+      </div> */}
     </div>
   );
 };
