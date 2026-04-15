@@ -34,10 +34,14 @@ const Chat = () => {
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(messages));
     scrollToBottom();
-  }, [messages, isLoading]); // Also scroll when loading state changes
+  }, [messages, isLoading]);
 
+  // ✅ FIXED SCROLL
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end", // prevents going under navbar
+    });
   };
 
   const clearChat = () => {
@@ -54,7 +58,6 @@ const Chat = () => {
     setIsLoading(true);
 
     try {
-      // const response = await fetch('https://custom-rag-backend-2-sk69.onrender.com/ask', {
       const response = await fetch("http://127.0.0.1:8000/ask", {
         method: "POST",
         headers: {
@@ -89,7 +92,7 @@ const Chat = () => {
 
   return (
     <div className="flex flex-col h-[100dvh] bg-[#FAFAFB] text-gray-800 font-['Inter'] relative w-full overflow-hidden">
-      {/* Soft Ambient Background Elements */}
+      {/* Background */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#6D5DFC]/[0.03] rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-[#FF8E8B]/[0.03] rounded-full blur-[120px] pointer-events-none" />
 
@@ -102,10 +105,12 @@ const Chat = () => {
           <ArrowLeft className="w-4 h-4" />
           <span className="font-medium text-sm">Home</span>
         </button>
+
         <div className="font-semibold tracking-wide text-gray-800 flex items-center gap-2">
-          Abhi{" "}
+          Abhi
           <span className="flex h-2 w-2 rounded-full bg-[#6D5DFC] opacity-80"></span>
         </div>
+
         <button
           onClick={clearChat}
           className="text-xs font-medium text-gray-400 hover:text-red-500 transition-colors uppercase tracking-wider px-2"
@@ -114,8 +119,8 @@ const Chat = () => {
         </button>
       </header>
 
-      {/* Main Chat Area */}
-      <main className="flex-1 overflow-y-auto px-4 py-6 sm:py-8 z-10 w-full scrollbar-hide scroll-smooth pt-32">
+      {/* Main Chat */}
+      <main className="flex-1 overflow-y-auto px-4 py-6 sm:py-8 z-10 w-full scrollbar-hide scroll-smooth pt-16">
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           <AnimatePresence initial={false}>
             {messages.map((msg, idx) => (
@@ -126,55 +131,43 @@ const Chat = () => {
               <motion.div
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{
-                  opacity: 0,
-                  scale: 0.95,
-                  transition: { duration: 0.2 },
-                }}
+                exit={{ opacity: 0, scale: 0.95 }}
                 className="flex w-full justify-start mb-8 font-sans"
               >
                 <div className="flex max-w-[85%] md:max-w-[75%] gap-4 flex-row">
-                  <div className="shrink-0 pt-1">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-gradient-to-tr from-[#6D5DFC] to-[#FF8E8B] shadow-sm text-white font-bold text-sm">
-                      A
-                    </div>
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-gradient-to-tr from-[#6D5DFC] to-[#FF8E8B] text-white font-bold text-sm">
+                    A
                   </div>
 
-                  <div className="px-5 py-5 text-[15px] leading-relaxed shadow-sm bg-white text-gray-800 rounded-2xl rounded-tl-sm border border-gray-100 ring-1 ring-black/[0.02] flex items-center justify-center gap-1.5 h-[52px]">
+                  <div className="px-5 py-5 bg-white rounded-2xl border flex gap-1.5 h-[52px] items-center">
                     <motion.div
                       animate={{ y: [0, -4, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
-                      className="w-1.5 h-1.5 bg-[#6D5DFC]/60 rounded-full"
+                      transition={{ repeat: Infinity }}
+                      className="w-1.5 h-1.5 bg-[#6D5DFC] rounded-full"
                     />
                     <motion.div
                       animate={{ y: [0, -4, 0] }}
-                      transition={{
-                        duration: 0.6,
-                        repeat: Infinity,
-                        delay: 0.2,
-                      }}
-                      className="w-1.5 h-1.5 bg-[#6D5DFC]/60 rounded-full"
+                      transition={{ repeat: Infinity, delay: 0.2 }}
+                      className="w-1.5 h-1.5 bg-[#6D5DFC] rounded-full"
                     />
                     <motion.div
                       animate={{ y: [0, -4, 0] }}
-                      transition={{
-                        duration: 0.6,
-                        repeat: Infinity,
-                        delay: 0.4,
-                      }}
-                      className="w-1.5 h-1.5 bg-[#6D5DFC]/60 rounded-full"
+                      transition={{ repeat: Infinity, delay: 0.4 }}
+                      className="w-1.5 h-1.5 bg-[#6D5DFC] rounded-full"
                     />
                   </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-          <div ref={messagesEndRef} className="h-4" />
+
+          {/* ✅ FIX: Prevent overlap with navbar */}
+          <div ref={messagesEndRef} className="h-4 scroll-mt-24" />
         </div>
       </main>
 
-      {/* Input Area */}
-      <footer className="flex-none pb-1 sm:pb-2 pt-2 bg-gradient-to-t from-[#FAFAFB] via-[#FAFAFB] to-transparent z-20 sticky bottom-0">
+      {/* Footer */}
+      <footer className="flex-none pb-1 sm:pb-8 pt-2 bg-gradient-to-t from-[#FAFAFB] via-[#FAFAFB] to-transparent z-20 sticky bottom-0">
         <ChatInput onSend={handleSend} isLoading={isLoading} />
       </footer>
     </div>
